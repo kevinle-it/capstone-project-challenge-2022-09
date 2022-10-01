@@ -11,6 +11,7 @@
   "author": "Minh Tri Le <minhtrile.it@gmail.com",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.1"
   },
   "devDependencies": {
