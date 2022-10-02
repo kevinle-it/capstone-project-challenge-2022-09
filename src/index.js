@@ -1,11 +1,13 @@
-import * as dotenv from 'dotenv'
-dotenv.config()
-
-import express from "express";
+import express from 'express';
+import { employees } from './config/db.js';
 
 const app = express();
-const PORT = 5000;
 
 app.use(express.json());
 
-app.listen(PORT, () => console.log(`Server running on port: http://localhost:${PORT}`));
+app.get('/', async(req, res) => {
+  const emps = await employees.find().toArray();
+  res.send(emps);
+});
+
+export default app;
