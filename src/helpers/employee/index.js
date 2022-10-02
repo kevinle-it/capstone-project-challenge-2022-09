@@ -10,11 +10,10 @@ export const isEmployeeExist = async({ id, email }) => {
       ? new ObjectId(id)
       : typeof id === 'number' && id;
 
-  const foundEmployee = await employees.findOne({
+  // return null if not found, else return employee object
+  return await employees.findOne({
     ...((id && { _id }) || (email && { email })),
   });
-
-  return !!foundEmployee;
 };
 
 export const isManager = async({ id, email }) => {

@@ -45,11 +45,7 @@ export const registerEmployee = async({
         errDesc.managerId = 'Manager not found!';
       }
     }
-    if (!(  // non-empty object check
-      errDesc &&
-      Object.keys(errDesc).length === 0 &&
-      Object.getPrototypeOf(errDesc) === Object.prototype
-    )) {
+    if (!Object.isEmpty(errDesc)) {
       return {
         status: 400,
         data: {
@@ -104,6 +100,66 @@ export const registerEmployee = async({
         },
       };
     }
+  } catch (err) {
+    return {
+      status: 500,
+      data: {
+        message: err.message,
+      },
+    };
+  }
+};
+
+export const login = async({ email, password }) => {
+  try {
+    let errDesc = {};
+    if (!(email && password)) {
+      errDesc = {
+        ...!email && { email: 'Email is required!' },
+        ...!password && { password: 'Password is required!' },
+      };
+    }
+    if (!Object.isEmpty(errDesc)) {
+      return {
+        status: 400,
+        data: {
+          message: errDesc,
+        },
+      };
+    }
+    const foundEmployee = await isEmployeeExist({ email });
+    if (
+      foundEmployee &&
+      await bcrypt.compare(password, foundEmployee.encryptedPassword)
+    ) {
+      // Create token
+      const token = generateToken({
+        sub: foundEmployee._id.toString(),
+      }, '2h');
+
+      // Return new employee
+      return {
+        status: 200,
+        header: {
+          Authorization: token,
+        },
+        data: {
+          firstName: foundEmployee.firstName,
+          lastName: foundEmployee.lastName,
+          email: foundEmployee.email,
+          ...foundEmployee.profileSummary && { profileSummary: foundEmployee.profileSummary },
+          ...foundEmployee.imgUrl && { imgUrl: foundEmployee.imgUrl },
+          roleId: foundEmployee.roleId,
+          ...foundEmployee.roleId === ROLE_IDS.EMPLOYEE && { managerId: foundEmployee.managerId },
+        },
+      };
+    }
+    return {
+      status: 400,
+      data: {
+        message: 'Invalid credentials!',
+      },
+    };
   } catch (err) {
     return {
       status: 500,
