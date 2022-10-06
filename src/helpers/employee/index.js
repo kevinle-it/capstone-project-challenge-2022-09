@@ -56,3 +56,10 @@ export const findAllManagers = async() => {
     .project({ encryptedPassword: 0 })  // exclude a field
     .toArray();
 };
+
+export const findAllEmployees = async() => {
+  return await employees
+    .find()
+    .project({ encryptedPassword: 0 })
+    .toArray();
+};
