@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../helpers/authentication/index.js';
 import { ROLE_IDS } from '../../helpers/employee/constants.js';
-import { createNewEmployee, isEmployeeExist, isManager } from '../../helpers/employee/index.js';
+import { createNewEmployee, findAllManagers, isEmployeeExist, isManager } from '../../helpers/employee/index.js';
 
 export const registerEmployee = async({
                                         firstName,
@@ -165,6 +165,23 @@ export const login = async({ email, password }) => {
       status: 500,
       data: {
         message: err.message,
+      },
+    };
+  }
+};
+
+export const getAllManagers = async() => {
+  try {
+    const managers = await findAllManagers();
+    return {
+      status: 200,
+      data: managers,
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      data: {
+        message: e.message,
       },
     };
   }

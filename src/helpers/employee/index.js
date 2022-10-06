@@ -49,3 +49,10 @@ export const createNewEmployee = async({
     ...roleId === ROLE_IDS.EMPLOYEE && { managerId },
   });
 };
+
+export const findAllManagers = async() => {
+  return await employees
+    .find({ roleId: 2 })
+    .project({ encryptedPassword: 0 })  // exclude a field
+    .toArray();
+};
