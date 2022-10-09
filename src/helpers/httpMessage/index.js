@@ -1,4 +1,4 @@
-import { generateToken, TOKEN_EXPIRE_TIME } from '../authentication/index.js';
+import { generateToken } from '../authentication/index.js';
 
 export const OK = (data, header) => {
   return {
@@ -65,7 +65,19 @@ export const respond = (req, res) => (data) => {
   }
 
   if (data.status === 200) {
-    data.header && res.header(data.header);
+    const curUnixTimeInSeconds = Math.round(Date.now() / 1000);
+    let refreshedToken;
+    if (req?.token?.sub &&
+        curUnixTimeInSeconds < req?.token?.exp &&
+        req?.token?.exp - curUnixTimeInSeconds < 600) { // to be expired in next 10 minutes
+      refreshedToken = generateToken({
+        sub: req?.token?.sub,
+      });
+    }
+    res.header({
+      ...refreshedToken && { Authorization: refreshedToken },
+      ...data.header,
+    });
   } else {
     console.error(data);
   }
