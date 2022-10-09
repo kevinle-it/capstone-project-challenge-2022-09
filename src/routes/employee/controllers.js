@@ -78,7 +78,7 @@ export const registerEmployee = async({
       // Create token
       const token = generateToken({
         sub: newEmployee.insertedId,
-      }, '2h');
+      });
 
       // Return new employee
       return OK({
@@ -118,7 +118,7 @@ export const login = async({ email, password }) => {
       // Create token
       const token = generateToken({
         sub: foundEmployee._id.toString(),
-      }, '2h');
+      });
 
       // Return new employee
       return OK({
