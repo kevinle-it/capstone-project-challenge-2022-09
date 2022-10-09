@@ -1,4 +1,5 @@
 import express from 'express';
+import { authenticate, authorize } from '../../middlewares/auth.js';
 import { getAllEmployees, getAllManagers, login, registerEmployee } from './controllers.js';
 
 const router = express.Router();
@@ -18,9 +19,14 @@ router.get('/getAllManagers', async(req, res) => {
   res.respond(json);
 });
 
-router.get('/getAllUsers', async(req, res) => {
-  const json = await getAllEmployees();
-  res.respond(json);
-});
+router.get(
+  '/getAllUsers',
+  authenticate,
+  authorize([0, 2]),
+  async(req, res) => {
+    const json = await getAllEmployees();
+    res.respond(json);
+  }
+);
 
 export default router;

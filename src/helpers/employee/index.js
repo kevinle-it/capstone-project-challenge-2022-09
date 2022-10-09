@@ -19,11 +19,13 @@ export const isEmployeeExist = async({ id, email }) => {
 export const isManager = async({ id, email }) => {
   // Check if employee already exist
   // Validate if employee is a manager in our database
+  if (!(id || email)) {
+    return false;
+  }
   const foundManager = await employees.findOne({
     ...((id && { _id: new ObjectId(id) }) || (email && { email })),
     roleId: 2,
   });
-
   return !!foundManager;
 };
 
