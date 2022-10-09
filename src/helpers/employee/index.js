@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { employees } from '../../config/db.js';
-import { ROLE_IDS } from './constants.js';
+import { ROLE_ID } from './constants.js';
 
 export const isEmployeeExist = async({ id, email }) => {
   // Check if employee already exist
@@ -46,7 +46,7 @@ export const createNewEmployee = async({
     ...profileSummary && { profileSummary },
     ...imgUrl && { imgUrl },
     roleId,
-    ...roleId === ROLE_IDS.EMPLOYEE && { managerId },
+    ...roleId === ROLE_ID.EMPLOYEE && { managerId },
   });
 };
 

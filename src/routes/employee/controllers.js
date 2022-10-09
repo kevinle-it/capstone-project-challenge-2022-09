@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../helpers/authentication/index.js';
-import { ROLE_IDS } from '../../helpers/employee/constants.js';
+import { ROLE_ID } from '../../helpers/employee/constants.js';
 import {
   createNewEmployee,
   findAllEmployees,
@@ -35,7 +35,7 @@ export const registerEmployee = async({
       errDesc.roleId = 'Role is required!';
     } else if (typeof roleId !== 'number') {
       errDesc.roleId = 'RoleId must be a number!';
-    } else if (!Object.values(ROLE_IDS).includes(roleId)) {
+    } else if (!Object.values(ROLE_ID).includes(roleId)) {
       errDesc.roleId = 'Role not found!';
     } else if (roleId === 1) {
       if (!managerId) {
@@ -88,7 +88,7 @@ export const registerEmployee = async({
         ...profileSummary && { profileSummary },
         ...imgUrl && { imgUrl },
         roleId,
-        ...roleId === ROLE_IDS.EMPLOYEE && { managerId },
+        ...roleId === ROLE_ID.EMPLOYEE && { managerId },
       }, {
         Authorization: token,
       });
@@ -128,7 +128,7 @@ export const login = async({ email, password }) => {
         ...foundEmployee.profileSummary && { profileSummary: foundEmployee.profileSummary },
         ...foundEmployee.imgUrl && { imgUrl: foundEmployee.imgUrl },
         roleId: foundEmployee.roleId,
-        ...foundEmployee.roleId === ROLE_IDS.EMPLOYEE && { managerId: foundEmployee.managerId },
+        ...foundEmployee.roleId === ROLE_ID.EMPLOYEE && { managerId: foundEmployee.managerId },
       }, {
         Authorization: token,
       });
