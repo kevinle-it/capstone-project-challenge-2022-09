@@ -1,27 +1,26 @@
 import express from 'express';
-import { respond } from '../../helpers/index.js';
 import { getAllEmployees, getAllManagers, login, registerEmployee } from './controllers.js';
 
 const router = express.Router();
 
 router.post('/register', async(req, res) => {
   const json = await registerEmployee(req.body);
-  respond(json, res);
+  res.respond(json);
 });
 
 router.post('/login', async(req, res) => {
   const json = await login(req.body);
-  respond(json, res);
+  res.respond(json);
 });
 
 router.get('/getAllManagers', async(req, res) => {
   const json = await getAllManagers();
-  respond(json, res);
+  res.respond(json);
 });
 
 router.get('/getAllUsers', async(req, res) => {
   const json = await getAllEmployees();
-  respond(json, res);
+  res.respond(json);
 });
 
 export default router;

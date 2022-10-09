@@ -6,17 +6,3 @@ Object.isEmpty = (obj) => {
          Object.getPrototypeOf(obj) === Object.prototype;
 };
 
-export const respond = (json, res) => {
-  res.status(json.status);
-
-  if (json.status === 200) {
-    res.header(json.header);
-  } else {
-    console.error(json);
-  }
-
-  res.send({
-    status: json.status,
-    data: json.data,
-  });
-};

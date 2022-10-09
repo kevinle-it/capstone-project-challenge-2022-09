@@ -8,6 +8,7 @@ import {
   isEmployeeExist,
   isManager,
 } from '../../helpers/employee/index.js';
+import { BAD_REQUEST, INTERNAL_SERVER_ERROR, OK } from '../../helpers/httpMessage/index.js';
 
 export const registerEmployee = async({
                                         firstName,
@@ -52,21 +53,11 @@ export const registerEmployee = async({
       }
     }
     if (!Object.isEmpty(errDesc)) {
-      return {
-        status: 400,
-        data: {
-          message: errDesc,
-        },
-      };
+      return BAD_REQUEST(errDesc);
     }
 
     if (await isEmployeeExist({ email })) {
-      return {
-        status: 400,
-        data: {
-          message: 'Employee Already Exist. Please Login.',
-        },
-      };
+      return BAD_REQUEST('Employee Already Exist. Please Login.');
     }
 
     //Encrypt employee password
@@ -90,29 +81,20 @@ export const registerEmployee = async({
       }, '2h');
 
       // Return new employee
-      return {
-        status: 200,
-        header: {
-          Authorization: token,
-        },
-        data: {
-          firstName,
-          lastName,
-          email,
-          ...profileSummary && { profileSummary },
-          ...imgUrl && { imgUrl },
-          roleId,
-          ...roleId === ROLE_IDS.EMPLOYEE && { managerId },
-        },
-      };
+      return OK({
+        firstName,
+        lastName,
+        email,
+        ...profileSummary && { profileSummary },
+        ...imgUrl && { imgUrl },
+        roleId,
+        ...roleId === ROLE_IDS.EMPLOYEE && { managerId },
+      }, {
+        Authorization: token,
+      });
     }
   } catch (err) {
-    return {
-      status: 500,
-      data: {
-        message: err.message,
-      },
-    };
+    return INTERNAL_SERVER_ERROR(err.message);
   }
 };
 
@@ -126,12 +108,7 @@ export const login = async({ email, password }) => {
       };
     }
     if (!Object.isEmpty(errDesc)) {
-      return {
-        status: 400,
-        data: {
-          message: errDesc,
-        },
-      };
+      return BAD_REQUEST(errDesc);
     }
     const foundEmployee = await isEmployeeExist({ email });
     if (
@@ -144,68 +121,38 @@ export const login = async({ email, password }) => {
       }, '2h');
 
       // Return new employee
-      return {
-        status: 200,
-        header: {
-          Authorization: token,
-        },
-        data: {
-          firstName: foundEmployee.firstName,
-          lastName: foundEmployee.lastName,
-          email: foundEmployee.email,
-          ...foundEmployee.profileSummary && { profileSummary: foundEmployee.profileSummary },
-          ...foundEmployee.imgUrl && { imgUrl: foundEmployee.imgUrl },
-          roleId: foundEmployee.roleId,
-          ...foundEmployee.roleId === ROLE_IDS.EMPLOYEE && { managerId: foundEmployee.managerId },
-        },
-      };
+      return OK({
+        firstName: foundEmployee.firstName,
+        lastName: foundEmployee.lastName,
+        email: foundEmployee.email,
+        ...foundEmployee.profileSummary && { profileSummary: foundEmployee.profileSummary },
+        ...foundEmployee.imgUrl && { imgUrl: foundEmployee.imgUrl },
+        roleId: foundEmployee.roleId,
+        ...foundEmployee.roleId === ROLE_IDS.EMPLOYEE && { managerId: foundEmployee.managerId },
+      }, {
+        Authorization: token,
+      });
     }
-    return {
-      status: 400,
-      data: {
-        message: 'Invalid credentials!',
-      },
-    };
+    return BAD_REQUEST('Invalid credentials!');
   } catch (err) {
-    return {
-      status: 500,
-      data: {
-        message: err.message,
-      },
-    };
+    return INTERNAL_SERVER_ERROR(err.message);
   }
 };
 
 export const getAllManagers = async() => {
   try {
     const managers = await findAllManagers();
-    return {
-      status: 200,
-      data: managers,
-    };
+    return OK(managers);
   } catch (e) {
-    return {
-      status: 500,
-      data: {
-        message: e.message,
-      },
-    };
+    return INTERNAL_SERVER_ERROR(e.message);
   }
 };
 
 export const getAllEmployees = async() => {
   try {
     const employees = await findAllEmployees();
-    return {
-      status: 200,
-      data: employees,
-    };
+    return OK(employees);
   } catch (e) {
-    return {
-      status: 500,
-      data: {
-        message: e.message,
-      },
-    };
+    return INTERNAL_SERVER_ERROR(e.message);
   }
 };
