@@ -1,5 +1,9 @@
 import { INTERNAL_SERVER_ERROR, OK } from '../../helpers/httpMessage/index.js';
-import { findAllEmployeeQuestions, findAllManagerQuestions } from '../../helpers/question/index.js';
+import {
+  findAllEmployeeQuestions,
+  findAllManagerQuestions,
+  findAllSelfReviewQuestions,
+} from '../../helpers/question/index.js';
 
 export const getManagerReviewQuestions = async() => {
   try {
@@ -13,6 +17,15 @@ export const getManagerReviewQuestions = async() => {
 export const getEmployeeReviewQuestions = async() => {
   try {
     const questions = await findAllEmployeeQuestions();
+    return OK(questions);
+  } catch (e) {
+    return INTERNAL_SERVER_ERROR(e.message);
+  }
+};
+
+export const getSelfReviewQuestions = async() => {
+  try {
+    const questions = await findAllSelfReviewQuestions();
     return OK(questions);
   } catch (e) {
     return INTERNAL_SERVER_ERROR(e.message);
