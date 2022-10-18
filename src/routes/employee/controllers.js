@@ -93,6 +93,7 @@ export const registerEmployee = async({
         Authorization: token,
       });
     }
+    return INTERNAL_SERVER_ERROR('Error creating employee');
   } catch (err) {
     return INTERNAL_SERVER_ERROR(err.message);
   }

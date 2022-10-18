@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb';
+
 Object.isEmpty = (obj) => {
   if (obj == null || typeof obj !== 'object') {
     return true;
@@ -6,3 +8,7 @@ Object.isEmpty = (obj) => {
          Object.getPrototypeOf(obj) === Object.prototype;
 };
 
+export const convertToMongoDbId = (id) =>
+  id && typeof id === 'string'
+    ? new ObjectId(id)
+    : (id instanceof ObjectId || typeof id === 'number') && id;

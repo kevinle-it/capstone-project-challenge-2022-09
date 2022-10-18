@@ -22,7 +22,6 @@ router.get('/getAllManagers', async(req, res) => {
 router.get(
   '/getAllUsers',
   authenticate,
-  authorize([0, 2]),
   async(req, res) => {
     const json = await getAllEmployees();
     res.respond(json);

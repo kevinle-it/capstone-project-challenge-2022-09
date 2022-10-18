@@ -1,0 +1,9 @@
+export const REVIEW_TYPE = {
+  SELF: {
+    EMPLOYEE: 0,
+    MANAGER: 1,
+  },
+  PEER: 2,
+  EMPLOYEE_TO_MANAGER: 3,
+  MANAGER_TO_EMPLOYEE: 4,
+};

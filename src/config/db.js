@@ -4,7 +4,9 @@ import app from '../index.js';
 let dbClient,
   hiveDb,
   employees,
-  questions;
+  questions,
+  reviews,
+  reviewAnswers;
 
 const PORT = process.env.PORT || 5000;
 
@@ -15,6 +17,8 @@ MongoClient
     hiveDb = client.db('Hive');
     employees = hiveDb.collection('Employees');
     questions = hiveDb.collection('Questions');
+    reviews = hiveDb.collection('Reviews');
+    reviewAnswers = hiveDb.collection('ReviewAnswers');
 
     app.listen(PORT, () => console.log(`Server running on port: http://localhost:${PORT}`));
   }, (err) => {
@@ -29,4 +33,6 @@ export {
   hiveDb,
   employees,
   questions,
+  reviews,
+  reviewAnswers,
 };
