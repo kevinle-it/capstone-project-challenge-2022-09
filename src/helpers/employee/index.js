@@ -198,3 +198,10 @@ export const addPoints = async({ employeeId, avgOverallRating }) => {
          result.modifiedCount === 1 &&
          result;
 };
+
+export const redeemPoints = async({ employeeId, points }) => {
+  return await employees.updateOne(
+    { _id: convertToMongoDbId(employeeId) },
+    { $inc: { numRedeemedPoints: points } },
+  );
+};

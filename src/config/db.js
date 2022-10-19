@@ -7,7 +7,8 @@ let dbClient,
   questions,
   reviews,
   reviewAnswers,
-  rewards;
+  rewards,
+  employeeRedeemedRewards;
 
 const PORT = process.env.PORT || 5000;
 
@@ -21,6 +22,7 @@ MongoClient
     reviews = hiveDb.collection('Reviews');
     reviewAnswers = hiveDb.collection('ReviewAnswers');
     rewards = hiveDb.collection('Rewards');
+    employeeRedeemedRewards = hiveDb.collection('EmployeeRedeemedRewards');
 
     app.listen(PORT, () => console.log(`Server running on port: http://localhost:${PORT}`));
   }, (err) => {
@@ -38,4 +40,5 @@ export {
   reviews,
   reviewAnswers,
   rewards,
+  employeeRedeemedRewards,
 };
