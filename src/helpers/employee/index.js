@@ -40,6 +40,15 @@ export const createNewEmployee = async({
                                          imgUrl,
                                          roleId,
                                          managerId,
+                                         selfOverallRating,
+                                         avgPeersOverallRating,
+                                         managerOverallRating,
+                                         hasNominated,
+                                         numVotes,
+                                         numCollectedPoints,
+                                         numRedeemedPoints,
+                                         numCollectedMonthlyRewards,
+                                         numRedeemedMonthlyRewards,
                                        }) => {
   // Create employee in our database
   return await employees.insertOne({
@@ -51,6 +60,15 @@ export const createNewEmployee = async({
     ...imgUrl && { imgUrl },
     roleId,
     ...roleId === ROLE_ID.EMPLOYEE && { managerId: convertToMongoDbId(managerId) },
+    ...(selfOverallRating && { selfOverallRating }) || { selfOverallRating: 0 },
+    ...(avgPeersOverallRating && { avgPeersOverallRating }) || { avgPeersOverallRating: 0 },
+    ...roleId === ROLE_ID.EMPLOYEE && ((managerOverallRating && { managerOverallRating }) || { managerOverallRating: 0 }),
+    ...(hasNominated && { hasNominated }) || { hasNominated: false },
+    ...(numVotes && { numVotes }) || { numVotes: 0 },
+    ...(numCollectedPoints && { numCollectedPoints }) || { numCollectedPoints: 0 },
+    ...(numRedeemedPoints && { numRedeemedPoints }) || { numRedeemedPoints: 0 },
+    ...(numCollectedMonthlyRewards && { numCollectedMonthlyRewards }) || { numCollectedMonthlyRewards: 0 },
+    ...(numRedeemedMonthlyRewards && { numRedeemedMonthlyRewards }) || { numRedeemedMonthlyRewards: 0 },
   });
 };
 

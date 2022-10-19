@@ -72,6 +72,15 @@ export const registerEmployee = async({
       imgUrl,
       roleId,
       managerId,
+      selfOverallRating: 0,
+      avgPeersOverallRating: 0,
+      managerOverallRating: 0,
+      hasNominated: false,
+      numVotes: 0,
+      numCollectedPoints: 0,
+      numRedeemedPoints: 0,
+      numCollectedMonthlyRewards: 0,
+      numRedeemedMonthlyRewards: 0,
     });
 
     if (newEmployee.acknowledged) {
@@ -89,6 +98,15 @@ export const registerEmployee = async({
         ...imgUrl && { imgUrl },
         roleId,
         ...roleId === ROLE_ID.EMPLOYEE && { managerId },
+        selfOverallRating: 0,
+        avgPeersOverallRating: 0,
+        ...roleId === ROLE_ID.EMPLOYEE && { managerOverallRating: 0 },
+        hasNominated: false,
+        numVotes: 0,
+        numCollectedPoints: 0,
+        numRedeemedPoints: 0,
+        numCollectedMonthlyRewards: 0,
+        numRedeemedMonthlyRewards: 0,
       }, {
         Authorization: token,
       });
