@@ -148,6 +148,15 @@ export const login = async({ email, password }) => {
         ...foundEmployee.imgUrl && { imgUrl: foundEmployee.imgUrl },
         roleId: foundEmployee.roleId,
         ...foundEmployee.roleId === ROLE_ID.EMPLOYEE && { managerId: foundEmployee.managerId },
+        selfOverallRating: foundEmployee.selfOverallRating,
+        avgPeersOverallRating: foundEmployee.avgPeersOverallRating,
+        ...foundEmployee.roleId === ROLE_ID.EMPLOYEE && { managerOverallRating: foundEmployee.managerOverallRating },
+        hasNominated: foundEmployee.hasNominated,
+        numVotes: foundEmployee.numVotes,
+        numCollectedPoints: foundEmployee.numCollectedPoints,
+        numRedeemedPoints: foundEmployee.numRedeemedPoints,
+        numCollectedMonthlyRewards: foundEmployee.numCollectedMonthlyRewards,
+        numRedeemedMonthlyRewards: foundEmployee.numRedeemedMonthlyRewards,
       }, {
         Authorization: token,
       });
