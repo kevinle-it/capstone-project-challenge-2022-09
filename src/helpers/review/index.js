@@ -216,3 +216,215 @@ export const hasGotManagerReview = async(employeeId) => {
   });
   return !!foundReview;
 };
+
+export const getAllSelfReviewQuestionAndAnswerSet = async(employeeId) => {
+  return await reviews.aggregate([
+    {
+      $match: {
+        fromEmployeeId: convertToMongoDbId(employeeId),
+        toEmployeeId: convertToMongoDbId(employeeId),
+        date: {
+          $gte: getFirstWeekdayUtcTimeOfCurrentWeek(),
+          $lte: getLastWeekdayUtcTimeOfCurrentWeek(),
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'ReviewAnswers',
+        localField: '_id',
+        foreignField: 'reviewId',
+        pipeline: [{ $project: { _id: 0 } }],
+        as: 'answerArray',
+      },
+    },
+    { $unwind: '$answerArray' },
+    { $replaceRoot: { newRoot: '$answerArray' } },
+    {
+      $lookup: {
+        from: 'Questions',
+        localField: 'questionId',
+        foreignField: '_id',
+        pipeline: [{ $project: { _id: 0 } }],
+        as: 'questionArray',
+      },
+    },
+    { $replaceRoot: { newRoot: { $mergeObjects: [{ $arrayElemAt: ['$questionArray', 0] }, '$$ROOT'] } } },
+    {
+      $project: {
+        questionId: 1,
+        question: 1,
+        answer: 1,
+        answerTypeId: 1,
+      },
+    },
+  ]).toArray();
+};
+
+export const getAllPeerReviewQuestionAndAnswerSet = async(employeeId) => {
+  return await reviews.aggregate([
+    {
+      $match: {
+        fromEmployeeId: { $ne: convertToMongoDbId(employeeId) },
+        toEmployeeId: convertToMongoDbId(employeeId),
+        date: {
+          $gte: getFirstWeekdayUtcTimeOfCurrentWeek(),
+          $lte: getLastWeekdayUtcTimeOfCurrentWeek(),
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'Employees',
+        localField: 'fromEmployeeId',
+        foreignField: '_id',
+        pipeline: [{
+          $project: {
+            _id: 0,
+            fromEmployeeRoleId: '$roleId',
+          },
+        }],
+        as: 'fromEmployee',
+      },
+    },
+    { $replaceRoot: { newRoot: { $mergeObjects: [{ $arrayElemAt: ['$fromEmployee', 0] }, '$$ROOT'] } } },
+    { $match: { fromEmployeeRoleId: ROLE_ID.EMPLOYEE } },
+    {
+      $lookup: {
+        from: 'ReviewAnswers',
+        localField: '_id',
+        foreignField: 'reviewId',
+        pipeline: [{ $project: { _id: 0 } }],
+        as: 'answerArray',
+      },
+    },
+    { $unwind: '$answerArray' },
+    { $replaceRoot: { newRoot: '$answerArray' } },
+    {
+      $lookup: {
+        from: 'Questions',
+        localField: 'questionId',
+        foreignField: '_id',
+        pipeline: [{
+          $project: {
+            _id: 0,
+          },
+        }],
+        as: 'questionArray',
+      },
+    },
+    { $replaceRoot: { newRoot: { $mergeObjects: [{ $arrayElemAt: ['$questionArray', 0] }, '$$ROOT'] } } },
+    {
+      $project: {
+        questionId: 1,
+        question: 1,
+        answer: 1,
+        answerTypeId: 1,
+      },
+    },
+    {
+      $group: {
+        _id: '$questionId',
+        question: { $first: '$question' },
+        answerTypeId: { $first: '$answerTypeId' },
+        avgRating: {
+          $avg: {
+            $cond: {
+              if: { $eq: ['$answerTypeId', ANSWER_TYPE_ID.RATING_1_TO_5] },
+              then: '$answer',
+              else: 0,
+            },
+          },
+        },
+        totalYes: {
+          $sum: {
+            $cond: {
+              if: {
+                $and: [
+                  { $eq: ['$answerTypeId', ANSWER_TYPE_ID.YES_OR_NO] },
+                  { $eq: ['$answer', 1] },
+                ],
+              },
+              then: 1,
+              else: 0,
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        questionId: '$_id',
+        question: 1,
+        answerTypeId: 1,
+        avgRating: 1,
+        totalYes: 1,
+      },
+    },
+  ]).toArray();
+};
+
+export const getAllManagerReviewQuestionAndAnswerSet = async(employeeId) => {
+  return await reviews.aggregate([
+    {
+      $match: {
+        fromEmployeeId: { $ne: convertToMongoDbId(employeeId) },
+        toEmployeeId: convertToMongoDbId(employeeId),
+        date: {
+          $gte: getFirstWeekdayUtcTimeOfCurrentWeek(),
+          $lte: getLastWeekdayUtcTimeOfCurrentWeek(),
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'Employees',
+        localField: 'fromEmployeeId',
+        foreignField: '_id',
+        pipeline: [{
+          $project: {
+            _id: 0,
+            fromEmployeeRoleId: '$roleId',
+          },
+        }],
+        as: 'fromEmployee',
+      },
+    },
+    { $replaceRoot: { newRoot: { $mergeObjects: [{ $arrayElemAt: ['$fromEmployee', 0] }, '$$ROOT'] } } },
+    { $match: { fromEmployeeRoleId: ROLE_ID.MANAGER } },
+    {
+      $lookup: {
+        from: 'ReviewAnswers',
+        localField: '_id',
+        foreignField: 'reviewId',
+        pipeline: [{ $project: { _id: 0 } }],
+        as: 'answerArray',
+      },
+    },
+    { $unwind: '$answerArray' },
+    { $replaceRoot: { newRoot: '$answerArray' } },
+    {
+      $lookup: {
+        from: 'Questions',
+        localField: 'questionId',
+        foreignField: '_id',
+        pipeline: [{
+          $project: {
+            _id: 0,
+          },
+        }],
+        as: 'questionArray',
+      },
+    },
+    { $replaceRoot: { newRoot: { $mergeObjects: [{ $arrayElemAt: ['$questionArray', 0] }, '$$ROOT'] } } },
+    {
+      $project: {
+        questionId: 1,
+        question: 1,
+        answer: 1,
+        answerTypeId: 1,
+      },
+    },
+  ]).toArray();
+};

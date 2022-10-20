@@ -1,5 +1,5 @@
 import express from 'express';
-import { review } from '../review/controllers.js';
+import { getReviewDetails, review } from '../review/controllers.js';
 
 const router = express.Router();
 
@@ -22,5 +22,11 @@ router.post(
     res.respond(json);
   },
 );
+
+router.get('/getReviewDetails', async(req, res) => {
+  const { sub: employeeId } = req.token;
+  const json = await getReviewDetails(employeeId);
+  res.respond(json);
+});
 
 export default router;

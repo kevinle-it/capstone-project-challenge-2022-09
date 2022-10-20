@@ -13,6 +13,9 @@ import { REVIEW_TYPE } from '../../helpers/review/constants.js';
 import {
   createNewReview,
   deleteReview,
+  getAllManagerReviewQuestionAndAnswerSet,
+  getAllPeerReviewQuestionAndAnswerSet,
+  getAllSelfReviewQuestionAndAnswerSet,
   hasDoneSelfReview,
   hasGotAllPeerReviews,
   hasGotManagerReview,
@@ -336,4 +339,38 @@ const doManagerSelfReview = async({ toEmployee, overallRating }) => {
       await addPoints({ employeeId: toEmployeeId, avgOverallRating });
     }
   }
+};
+
+export const getReviewDetails = async(employeeId) => {
+  const employee = await isEmployeeExist({ id: employeeId });
+  if (!employee) {
+    return BAD_REQUEST('Employee not found');
+  }
+  const selfReviewDetails = {
+    questions: await getAllSelfReviewQuestionAndAnswerSet(employeeId),
+    selfOverallRating: employee.selfOverallRating,
+  };
+  const peerReviewDetails = {
+    questions: await getAllPeerReviewQuestionAndAnswerSet(employeeId),
+    avgPeersOverallRating: employee.avgPeersOverallRating,
+  };
+  let managerReviewDetails;
+  if (employee.roleId === ROLE_ID.EMPLOYEE) {
+    managerReviewDetails = {
+      questions: await getAllManagerReviewQuestionAndAnswerSet(employeeId),
+      managerOverallRating: employee.managerOverallRating,
+    };
+  }
+  const avgOverallRating = calcAvgOverallRating({
+    roleId: employee.roleId,
+    selfOverallRating: employee.selfOverallRating,
+    avgPeersOverallRating: employee.avgPeersOverallRating,
+    ...employee.roleId === ROLE_ID.EMPLOYEE && { managerOverallRating: employee.managerOverallRating },
+  });
+  return OK({
+    selfReviewDetails,
+    peerReviewDetails,
+    ...employee.roleId === ROLE_ID.EMPLOYEE && { managerReviewDetails },
+    avgOverallRating,
+  });
 };
